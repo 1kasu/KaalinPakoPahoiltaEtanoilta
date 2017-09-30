@@ -4,6 +4,8 @@ var game = new Phaser.Game(window.innerWidth * window.devicePixelRatio, window.i
 
 var kentta;
 
+var pisteet = 0;
+
 function preload() {
     // Ladataan resurssit
     game.load.image('etana','kuvat/Ilkea_etana.png');
@@ -195,11 +197,13 @@ class Kentta {
                 if (++h.x >= this.leveys) {
                     h.x = 0;
                 }
+                pisteet++;
             }
             if (suunta == suunnat.VASEN) {
                 if (--h.x < 0) {
                     h.x = this.leveys - 1;
                 }
+                pisteet--;
             }
             if (suunta == suunnat.YLOS) {
                 if (--h.y < 0) {
@@ -258,6 +262,7 @@ class Kentta {
         }
         this.hahmot = [];
         if (typeof this.pelihahmo !== 'undefined') this.pelihahmo.s.destroy();
+        this.pelihahmo = undefined;
         
     }
     
@@ -277,25 +282,30 @@ class Kentta {
 
 //Luo alkukentän
 function luoKentta() {
-    var xruutuja = 9;
+    var xruutuja = 10;
     var yruutuja = 3;
     
     var kentta = new Kentta(10,window.innerWidth - 10, 0, window.innerHeight, xruutuja,yruutuja);
     var hahmo = new Hahmo('kaali', "kaali", 0, 0);
-    var hahmo2 = new Hahmo('etana', "etana", 2, 2);
-    var hahmo3 = new Hahmo('etana', "etana2", 6, 1);
-    var hahmo4 = new Hahmo('etana', "etana3", 2, 0);
-    
+    var hahmo2 = new Hahmo('etana', "etana2", 3, 0);
+    var hahmo3 = new Hahmo('etana', "etana3", 3, 1);
+    var hahmo4 = new Hahmo('etana', "etana4", 3, 2);
+    var hahmo5 = new Hahmo('etana', "etana5", 5, 1);
+    var hahmo6 = new Hahmo('etana', "etana6", 8, 1);
     
     
     hahmo2.aly = new Liikkumisjarki(0,4,0);
-    hahmo3.aly = new Liikkumisjarki(4,8,0);
+    hahmo3.aly = new Liikkumisjarki(5,9,0);
     hahmo4.aly = new Liikkumisjarki(0,4,0);
+    hahmo5.aly = new Liikkumisjarki(3,7,0);
+    hahmo6.aly = new Liikkumisjarki(6,9,0);
     
     kentta.lisaaPelihahmo(hahmo);
     kentta.lisaaHahmo(hahmo2); 
     kentta.lisaaHahmo(hahmo3);
     kentta.lisaaHahmo(hahmo4);
+    kentta.lisaaHahmo(hahmo5);
+    kentta.lisaaHahmo(hahmo6);
     
     return kentta;
 }
@@ -303,11 +313,13 @@ function luoKentta() {
 
 function create() {
     game.stage.backgroundColor = "#4488AA";// Asetetaan taustaväri
+    piste_teksti = game.add.text(game.world.centerX, game.world.top, "Pisteet: 0", {font: "32px Arial", fill: "#ffffff", align: "right"});
+    //piste_teksti.anchor.setTo(0.6,0.3);
     
     kentta = luoKentta();
 }
 
-
+var piste_teksti;
 var elamat = 3;
 
 // Muistina, että mihin suuntaan ollaan menossa.
@@ -363,6 +375,7 @@ function update() {
     }
     
     kentta.piirra();
+    piste_teksti.setText('Pisteet: ' + pisteet);
     //resize(); //Ei toimi. Aiheuttaa värinää.
 }
 
