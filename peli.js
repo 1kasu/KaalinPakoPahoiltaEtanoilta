@@ -10,6 +10,55 @@ function preload() {
     game.load.image('kaali','kuvat/cabbage.png');
 }
 
+class Liikkumisjarki{
+    constructor(alue_x1, alue_x2, kaytettavaJarkiNmr) {
+        this.alue_x1 = alue_x1;//Alue, jolla saa liikkua.
+        this.alue_x2 = alue_x2;
+        this.jarkiNmr = kaytettavaJarkiNmr;
+    }
+    
+    kaytaJarkea(oma_x, oma_y, jahti_x, jahti_y){
+        if (this.jarkiNmr == 0) return this.liikkumislogiikka_jahtaus(oma_x, oma_y, jahti_x, jahti_y);
+        else return suunnat.PAIKKA;
+    }
+    
+    // Liikkumislogiikka, joka jahtaa kohdetta.
+    liikkumislogiikka_jahtaus(oma_x, oma_y, jahti_x, jahti_y){
+        var jahdattavan_suhteellinen_suunta_x = jahti_x - oma_x;
+        var jahdattavan_suhteellinen_suunta_y = jahti_y - oma_y;
+        
+        var suunta;
+        if (Math.abs(jahdattavan_suhteellinen_suunta_x) <= Math.abs(jahdattavan_suhteellinen_suunta_y)) {
+            if (jahdattavan_suhteellinen_suunta_y >= 0) {
+                suunta = suunnat.ALAS;
+            }
+            else {
+                suunta = suunnat.YLOS;
+            }
+        }
+        else {
+            if (jahdattavan_suhteellinen_suunta_x <= 0){
+                if (oma_x - 1 >= this.alue_x1) {
+                    suunta = suunnat.VASEN;
+                }
+                else {
+                    suunta = suunnat.PAIKKA;
+                }
+            }
+            else {
+                if (oma_x + 1 <= this.alue_x2) {
+                    suunta = suunnat.OIKEA;
+                }
+                else {
+                    suunta = suunnat.PAIKKA;
+                }
+            }
+        }
+        
+        return suunta;
+    }
+}
+
 class Hahmo {
     
     //Alustaa hahmon
@@ -19,6 +68,7 @@ class Hahmo {
         this.x = x;
         this.y = y;
         this.s = game.add.sprite(x, y, this.kuva);
+        this.aly_aika = game.rnd.integerInRange(10, 100);
     }
     
     //Piirtää hahmon
@@ -68,11 +118,42 @@ class Kentta {
         this.alue_y2 = alue_y2;
         
         this.g = game.add.graphics(0, 0);
+        
+        //Käynnistää tapahtuma loopin
+        game.time.events.loop(Phaser.Timer.SECOND * 0.1, this.paivitaAlya, this);
+    }
+    
+    
+    //Päivittää äly tapahtumia.
+    paivitaAlya(){
+        for(var i = 0; i < this.hahmot.length; i++){
+            var hahmo = this.hahmot[i];
+            hahmo.aly_aika--;
+            if (typeof this.pelihahmo == 'undefined') return;
+            if (hahmo.aly_aika <= 0){
+                var suunta = hahmo.aly.kaytaJarkea(hahmo.x,hahmo.y, this.pelihahmo.x, this.pelihahmo.y);
+                this.liikuta(hahmo.nimi, suunta);
+                hahmo.aly_aika = game.rnd.integerInRange(15, 60);
+            }
+            
+        }
     }
     
     //Lisää hahmon kenttään
     lisaaHahmo(hahmo) {
         this.hahmot.push(hahmo);
+    }
+    
+    lisaaPelihahmo(hahmo) {
+        this.pelihahmo = hahmo;
+    }
+    
+    onkoEtanoita(x,y){
+        for(var i = 0; i < this.hahmot.length; i++){
+            var h = this.hahmot[i];
+            if (h.x == x && h.y == y) return true;
+        }
+        return false;
     }
     
     
@@ -82,27 +163,55 @@ class Kentta {
             var h = this.hahmot[i];
             if (h.nimi == nimi) {
                 if (suunta == suunnat.OIKEA) {
+                    if (this.onkoEtanoita(h.x + 1,h.y)) return;
                     if (++h.x >= this.leveys) {
                         h.x = 0;
                     }
                 }
                 if (suunta == suunnat.VASEN) {
+                    if (this.onkoEtanoita(h.x - 1,h.y)) return;
                     if (--h.x < 0) {
                         h.x = this.leveys - 1;
                     }
                 }
                 if (suunta == suunnat.YLOS) {
+                    if (this.onkoEtanoita(h.x,h.y - 1)) return;
                     if (--h.y < 0) {
                         h.y = 0;
                     }
                 }
                 if (suunta == suunnat.ALAS) {
+                    if (this.onkoEtanoita(h.x, h.y + 1)) return;
                     if (++h.y >= this.korkeus) {
                         h.y = this.korkeus - 1;
                     }
                 }
             }
         }    
+        if (typeof this.pelihahmo == 'undefined') return;
+        var h = this.pelihahmo;
+        if (h.nimi == nimi) {
+            if (suunta == suunnat.OIKEA) {
+                if (++h.x >= this.leveys) {
+                    h.x = 0;
+                }
+            }
+            if (suunta == suunnat.VASEN) {
+                if (--h.x < 0) {
+                    h.x = this.leveys - 1;
+                }
+            }
+            if (suunta == suunnat.YLOS) {
+                if (--h.y < 0) {
+                    h.y = 0;
+                }
+            }
+            if (suunta == suunnat.ALAS) {
+                if (++h.y >= this.korkeus) {
+                    h.y = this.korkeus - 1;
+                }
+            }
+        }
     }
     
     //Päivittää piirtoalueen.
@@ -135,6 +244,10 @@ class Kentta {
         for (var i = 0; i < this.hahmot.length; i++) {
             this.hahmot[i].piirra(x, y, ruudun_leveys, ruudun_leveys);
         }
+        
+        if (typeof this.pelihahmo !== 'undefined'){
+            this.pelihahmo.piirra(x, y, ruudun_leveys, ruudun_leveys);
+        }
     }
     
     //Nollaa kentän
@@ -144,27 +257,20 @@ class Kentta {
             this.hahmot[i].s.destroy();
         }
         this.hahmot = [];
+        if (typeof this.pelihahmo !== 'undefined') this.pelihahmo.s.destroy();
+        
     }
     
     //Tarkistaa onko nimillä a ja b olevat hahmot samassa ruudussa.
-    onkoSamassa(a, b){
-        var a_x;
-        var a_y;
-        var b_x;
-        var b_y;
-        
-        for (var i = 0; i < this.hahmot.length; i++){
-            if (this.hahmot[i].nimi == a) {
-                a_x = this.hahmot[i].x;
-                a_y = this.hahmot[i].y;
-            }
-            if (this.hahmot[i].nimi == b) {
-                b_x = this.hahmot[i].x;
-                b_y = this.hahmot[i].y;
-            }
+    onkoSamassa(){
+        if (typeof this.pelihahmo == 'undefined') return (false);
+
+        for (var i = 0; i < this.hahmot.length; i++) {
+            var hahmo = this.hahmot[i];
+            if (this.pelihahmo.x == hahmo.x && this.pelihahmo.y == hahmo.y) return true;
         }
         
-        return (a_x === b_x && a_y === b_y);
+        return false;
     }
     
 }
@@ -177,9 +283,19 @@ function luoKentta() {
     var kentta = new Kentta(10,window.innerWidth - 10, 0, window.innerHeight, xruutuja,yruutuja);
     var hahmo = new Hahmo('kaali', "kaali", 0, 0);
     var hahmo2 = new Hahmo('etana', "etana", 2, 2);
+    var hahmo3 = new Hahmo('etana', "etana2", 6, 1);
+    var hahmo4 = new Hahmo('etana', "etana3", 2, 0);
     
-    kentta.lisaaHahmo(hahmo);
+    
+    
+    hahmo2.aly = new Liikkumisjarki(0,4,0);
+    hahmo3.aly = new Liikkumisjarki(4,8,0);
+    hahmo4.aly = new Liikkumisjarki(0,4,0);
+    
+    kentta.lisaaPelihahmo(hahmo);
     kentta.lisaaHahmo(hahmo2); 
+    kentta.lisaaHahmo(hahmo3);
+    kentta.lisaaHahmo(hahmo4);
     
     return kentta;
 }
@@ -203,7 +319,8 @@ var suunnat = {
     YLOS: 0,
     ALAS: 1,
     VASEN: 2,
-    OIKEA: 3   
+    OIKEA: 3,  
+    PAIKKA: 4
 };
 
 function update() {
@@ -234,7 +351,7 @@ function update() {
     }
     
     //Tarkistaa tuliko syödyksi
-    if (kentta.onkoSamassa("kaali", "etana")) {
+    if (kentta.onkoSamassa()) {
         kentta.nollaaKentta();
         
         if (--elamat <= 0){
