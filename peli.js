@@ -10,7 +10,10 @@ function preload() {
     // Ladataan resurssit
     game.load.image('etana','kuvat/Ilkea_etana.png');
     game.load.image('kaali','kuvat/cabbage.png');
+    game.load.image('kaaliHaukku','kuvat/cabbage_haukku.png');
+    game.load.image('kaaliHaukku2','kuvat/cabbage_haukku2.png');
     game.load.image('pohjakupla','kuvat/Pohjakupla.png');
+    game.load.image('pakokupla','kuvat/pakokupla.png');
 }
 
 class Liikkumisjarki{
@@ -210,6 +213,8 @@ class Hahmo {
     aseta_kupla(kupla) {
         this.poista_kupla();
         this.kupla = game.add.sprite(0,0, kupla);
+        this.kupla.alpha = 0;
+        game.add.tween(this.kupla).from( { alpha: 1 }, 2000, Phaser.Easing.Cubic.None, true, 2000, 0, false);
     }
     
     poista_kupla() {
@@ -421,7 +426,12 @@ function luoKentta() {
     var yruutuja = 3;
     
     var kentta = new Kentta(10,window.innerWidth - 10, 0, window.innerHeight, xruutuja,yruutuja);
-    var hahmo = new Hahmo('kaali', "kaali", 0, 0);
+    var hahmo;
+    if (elamat == 2) hahmo = new Hahmo('kaaliHaukku', "kaali", 0, 0);
+    else if (elamat == 1) hahmo = new Hahmo('kaaliHaukku2', "kaali", 0, 0);
+    else hahmo = new Hahmo('kaali', "kaali", 0, 0);
+    hahmo.aseta_kupla("pakokupla");
+    
     var hahmo2 = new Hahmo('etana', "etana2", 3, 0);
     var hahmo3 = new Hahmo('etana', "etana3", 3, 1);
     var hahmo4 = new Hahmo('etana', "etana4", 3, 2);
@@ -490,7 +500,7 @@ function update() {
             }
         }
     }
-    if (game.input.keyboard.isDown(Phaser.Keyboard.ENTER)) kentta.pelihahmo.aseta_kupla("pohjakupla");
+    if (game.input.keyboard.isDown(Phaser.Keyboard.ENTER)) kentta.pelihahmo.aseta_kupla("pakokupla");
     if (game.input.keyboard.isDown(Phaser.Keyboard.R)) kentta.hahmot[0].aseta_kupla("pohjakupla");
     
     //Tallentaa onko pohjassa
@@ -530,5 +540,9 @@ function resize(){
 
 // Pelin loppuminen
 function peliOhi(){
-    game.add.text(0,0, "Hävisit. Sinusta tehtiin kaalikääryleitä.");//Kirjoittaa lopputekstin
+    var r = game.rnd.integerInRange(0, 2);
+    if (r == 0) game.add.text(0,0, "Hävisit. Sinusta tehtiin kaalikääryleitä.");//Kirjoittaa lopputekstin
+    else if (r == 1) game.add.text(0,0, "Yritit oikein hienosti... \nMutta sinusta tuli silti kaalilaatikkoa.");
+    else if (r == 2) game.add.text(0,0, "Oikein hienoa! \n...Paitsi että hävisit ja jouduit kaalikeittoon.");
+    
 }
