@@ -14,6 +14,7 @@ function preload() {
     game.load.image('kaaliHaukku2','kuvat/cabbage_haukku2.png');
     game.load.image('pohjakupla','kuvat/Pohjakupla.png');
     game.load.image('pakokupla','kuvat/pakokupla.png');
+    game.load.image('IFE','kuvat/IFE_hoikempi.png');
 }
 
 class Liikkumisjarki{
@@ -177,7 +178,7 @@ class Hahmo {
         var skaalain;
         
         if (hk < wk) {
-            skaalain = (xl - (xl / 10.0)) / wk;        
+            skaalain = (xl - (xl / 100.0)) / wk;        
         }
         else {
             skaalain = (yl - (yl / 10.0)) / hk;
@@ -435,7 +436,7 @@ function luoKentta() {
     var hahmo2 = new Hahmo('etana', "etana2", 3, 0);
     var hahmo3 = new Hahmo('etana', "etana3", 3, 1);
     var hahmo4 = new Hahmo('etana', "etana4", 3, 2);
-    var hahmo5 = new Hahmo('etana', "etana5", 5, 1);
+    var hahmo5 = new Hahmo('IFE', "etana5", 5, 1);
     var hahmo6 = new Hahmo('etana', "etana6", 8, 1);
     
     
