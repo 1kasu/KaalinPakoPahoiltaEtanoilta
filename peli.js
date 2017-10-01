@@ -531,19 +531,27 @@ function update() {
 function resize(){
     var w = window.innerWidth * window.devicePixelRatio;
     game.width = w;
+    game.world.width = w;
     
     var h = window.innerHeight * window.devicePixelRatio;
-    game.height = h
+    game.height = h;
+    game.world.height = h;
     
-    kentta.paivitaAlue(10,window.innerWidth - 10, 0, window.innerHeight);
+    kentta.paivitaAlue(10,game.width - 10, 0, game.height);
+    
+    piste_teksti.x = game.world.centerX;
+    piste_teksti.y = game.world.top;
+    
     //kentta.paivitaAlue(10,w - 10, 0, h);
 }
 
 // Pelin loppuminen
 function peliOhi(){
-    var r = game.rnd.integerInRange(0, 2);
+    var r = game.rnd.integerInRange(0, 5);
     if (r == 0) game.add.text(0,0, "Hävisit. Sinusta tehtiin kaalikääryleitä.");//Kirjoittaa lopputekstin
-    else if (r == 1) game.add.text(0,0, "Yritit oikein hienosti... \nMutta sinusta tuli silti kaalilaatikkoa.");
+    else if (r == 1) game.add.text(0,0, "Yritit oikein hienosti... \nMutta sinusta tuli silti kaalilaatikko.");
     else if (r == 2) game.add.text(0,0, "Oikein hienoa! \n...Paitsi että hävisit ja jouduit kaalikeittoon.");
-    
+    else if (r == 3) game.add.text(0,0, "...Olet tästä eteenpäin kaalisalaatti...");
+    else if (r == 4) game.add.text(0,0, "Surkimuksista tehdään kaalilasagnea.");
+    else if (r == 5) game.add.text(0,0, "Mukavaa jatkoa kaalitortillana.")
 }
