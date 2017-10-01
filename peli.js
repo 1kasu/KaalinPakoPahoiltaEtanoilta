@@ -17,6 +17,7 @@ function preload() {
     game.load.image('IFE','kuvat/IFE_hoikempi.png');
     game.load.image('IZE','kuvat/PZE.png');
     game.load.image('IHE','kuvat/IHE.png');
+    game.load.image('IEE','kuvat/IEE.png');
 }
 
 class Liikkumisjarki{
@@ -437,7 +438,7 @@ function luoKentta() {
     
     var hahmo2 = new Hahmo('etana', "etana2", 3, 0);
     var hahmo3 = new Hahmo('IHE', "etana3", 3, 1);
-    var hahmo4 = new Hahmo('etana', "etana4", 3, 2);
+    var hahmo4 = new Hahmo('IEE', "etana4", 3, 2);
     var hahmo5 = new Hahmo('IFE', "etana5", 5, 1);
     var hahmo6 = new Hahmo('IZE', "etana6", 8, 1);
     
