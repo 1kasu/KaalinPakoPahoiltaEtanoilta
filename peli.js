@@ -18,6 +18,7 @@ function preload() {
     game.load.image('IZE','kuvat/PZE.png');
     game.load.image('IHE','kuvat/IHE.png');
     game.load.image('IEE','kuvat/IEE.png');
+    game.load.image('IVE','kuvat/IVE.png');
 }
 
 class Liikkumisjarki{
@@ -436,11 +437,11 @@ function luoKentta() {
     else hahmo = new Hahmo('kaali', "kaali", 0, 0);
     hahmo.aseta_kupla("pakokupla");
     
-    var hahmo2 = new Hahmo('etana', "etana2", 3, 0);
+    var hahmo2 = new Hahmo('IZE', "etana2", 3, 0);
     var hahmo3 = new Hahmo('IHE', "etana3", 3, 1);
     var hahmo4 = new Hahmo('IEE', "etana4", 3, 2);
     var hahmo5 = new Hahmo('IFE', "etana5", 5, 1);
-    var hahmo6 = new Hahmo('IZE', "etana6", 8, 1);
+    var hahmo6 = new Hahmo('IVE', "etana6", 8, 1);
     
     
     hahmo2.aly = new Liikkumisjarki(0,4,0);
