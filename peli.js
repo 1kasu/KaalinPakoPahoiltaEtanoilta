@@ -20,6 +20,9 @@ function preload() {
     game.load.image('IEE','kuvat/IEE.png');
     game.load.image('IVE','kuvat/IVE.png');
     
+    game.load.audio('music', ['Free-bluegrass-music/Free-bluegrass-music.mp3', 'Free-bluegrass-music/Free-bluegrass-music.ogg']);
+    game.load.audio('crunch', ['Cartoon-crunching-bite/Cartoon-crunching-bite.mp3', 'Cartoon-crunching-bite/Cartoon-crunching-bite.ogg']);
+    
     //Kaalikuplat
     game.load.image('pakokupla','kuvat/pakokupla.png');
     
@@ -535,6 +538,9 @@ function luoKentta() {
 
 
 function create() {
+    music = game.add.audio('music');
+    music.loop = true;
+    music.play();
     game.stage.backgroundColor = "#4488AA";// Asetetaan taustaväri
     piste_teksti = game.add.text(game.world.centerX, game.world.top, "Pisteet: 0", {font: "32px Arial", fill: "#ffffff", align: "right"});
     //piste_teksti.anchor.setTo(0.6,0.3);
@@ -613,6 +619,8 @@ function update() {
 
 function osuma(f){
     kuollut = true;
+    crunch = game.add.audio('crunch');
+    crunch.play();
     game.time.events.add(Phaser.Timer.SECOND * 3, f, this);
     
 }
