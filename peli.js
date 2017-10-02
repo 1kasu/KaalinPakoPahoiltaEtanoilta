@@ -13,12 +13,40 @@ function preload() {
     game.load.image('kaaliHaukku','kuvat/cabbage_haukku.png');
     game.load.image('kaaliHaukku2','kuvat/cabbage_haukku2.png');
     game.load.image('pohjakupla','kuvat/Pohjakupla.png');
-    game.load.image('pakokupla','kuvat/pakokupla.png');
+    
     game.load.image('IFE','kuvat/IFE_hoikempi.png');
     game.load.image('IZE','kuvat/PZE.png');
     game.load.image('IHE','kuvat/IHE.png');
     game.load.image('IEE','kuvat/IEE.png');
     game.load.image('IVE','kuvat/IVE.png');
+    
+    //Kaalikuplat
+    game.load.image('pakokupla','kuvat/pakokupla.png');
+    
+    //Satunnaisia huutoja kaalille
+    game.load.image('KuolemaEtanoille','kuvat/KuolemaEtanoille.png');
+    game.load.image('Kaikkien','kuvat/Kaikkien.png');
+    game.load.image('Taparalla','kuvat/TuoOli.png');
+    game.load.image('Kanaa','kuvat/SyokaaKanaa.png');
+    game.load.image('VielaTaytyy','kuvat/VielaTaytyy.png');
+    game.load.image('EtteSaa','kuvat/EtteSaa.png');
+    
+    
+    //OsumaKupla
+    game.load.image('Lehteni','kuvat/KauniitLehteni.png');
+    game.load.image('Onneksi','kuvat/OnneksiPaasin.png');
+    game.load.image('AuSattuu','kuvat/AuSattuu.png');
+    game.load.image('AlaSyo','kuvat/AlkaaSyoko.png');
+    
+    //KierrosKupla kaalille
+    game.load.image('Miksi','kuvat/MiksiNayttaa.png');
+    game.load.image('OlenkoOllut','kuvat/OlenkoOllutKupla.png');
+    game.load.image('NuoOvat','kuvat/NuoOvatKupla.png');
+    
+    //KuolemaKuplat kaalille
+    game.load.image('Pimenee','kuvat/KaikkiPimenee.png');
+    game.load.image('OlikoTama','kuvat/OlikoTama.png');
+    game.load.image('HalusinVain','kuvat/HalusinVain.png');
     
     //Kuplakuvat
     game.load.image('Veitsi','kuvat/AlaValitaVeitsestaKupla.png');
@@ -628,6 +656,23 @@ function paivitaKuplat(){
     var P = kentta.pelihahmo;
     
     //Kuollut kommentit
+    if (tappoi == "H"){
+        P.asetaKupla("AuSattuu");
+    }
+    else if (tappoi != "") {//Kaalin osumakuplat
+        if  (elamat != 0) {
+            var kuplat = ['AlaSyo','Lehteni','Onneksi'];
+            var r = game.rnd.integerInRange(0, 2);
+            if (r < kuplat.length) P.asetaKupla(kuplat[r]);
+        }
+        else{//Kaalin kuolemakuplat
+            var kuplat = ['Pimenee','HalusinVain','OlikoTama'];
+            var r = game.rnd.integerInRange(0, 2);
+            if (r < kuplat.length) P.asetaKupla(kuplat[r]);
+        }
+    }
+    
+    // Etanoiden OsumaKuplat
     if (tappoi == "Zombi") kentta.asetaKupla(tappoi, 'Nam');
     else if (tappoi == "EnSano") kentta.asetaKupla(tappoi, 'Karsimaan');
     else if (tappoi == "H") kentta.asetaKupla(tappoi, 'EiSatu');
@@ -638,10 +683,14 @@ function paivitaKuplat(){
     //EtenemisKommentit
     var uusi_kaaliX = P.x;
     if (uusi_kaaliX > vanha_kaaliX) {
-        var kuplat = ['AlaPakoon','Napatkaa','Pysayttakaa'];
+        var kuplat = ['AlaPakoon','Napatkaa','Pysayttakaa'];//Etanalle
         var r = game.rnd.integerInRange(0, 40);
         if (r < kuplat.length) kentta.asetaKupla('EnSano', kuplat[r]);
-    }
+        
+        kuplat = ['KuolemaEtanoille','Kaikkien','Taparalla', 'Kanaa', 'VielaTaytyy','EtteSaa'];//Kaalille
+        r = game.rnd.integerInRange(0, 75);
+        if (r < kuplat.length) P.asetaKupla(kuplat[r]);
+    } 
     
     var H = kentta.annaHahmo('H');
     var uusi_HX = H.x;
@@ -658,7 +707,6 @@ function paivitaKuplat(){
         }
     }
     
-    
     //Satunnainen liikkumiskommentti.
     if (vanha_kaaliX != uusi_kaaliX && vanha_HX % 2 == 1) {
         var Z = kentta.annaHahmo('Zombi');
@@ -673,6 +721,13 @@ function paivitaKuplat(){
     //Pisteiden väliaika kommentti
     if (vanha_pisteet != pisteet && pisteet % 13 == 0 && pisteet != 0) {
         kentta.asetaKupla('Viikate', 'PPP');
+    }
+    
+    //Kierros kuplat kaalille
+    if (vanha_kaaliX == 9 && uusi_kaaliX == 0) {
+        var kuplat = ['Miksi','OlenkoOllut','NuoOvat'];
+        var r = game.rnd.integerInRange(0, 5);
+        if (r < kuplat.length) P.asetaKupla(kuplat[r]);
     }
     
     //Tallennetaan vanhat tiedot
