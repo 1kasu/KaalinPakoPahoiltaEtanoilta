@@ -19,6 +19,27 @@ function preload() {
     game.load.image('IHE','kuvat/IHE.png');
     game.load.image('IEE','kuvat/IEE.png');
     game.load.image('IVE','kuvat/IVE.png');
+    
+    //Kuplakuvat
+    game.load.image('Veitsi','kuvat/AlaValitaVeitsestaKupla.png');
+    game.load.image('EnTee','kuvat/EnTeePahaaKupla.png');
+    game.load.image('Kaaliseni','kuvat/KaaliseniKupla.png');
+    game.load.image('EiSatu','kuvat/TamaEiSatuKupla.png');
+    
+    game.load.image('AlaPakoon','kuvat/AlkaaPaastakoPakoonkupla.png');
+    game.load.image('Napatkaa','kuvat/Napatkaakupla.png');
+    game.load.image('Pysayttakaa','kuvat/Pysayttakaakupla.png');
+    game.load.image('Karsimaan','kuvat/Karsimaankupla.png');
+    
+    game.load.image('Nalka','kuvat/NalkaKupla.png');
+    game.load.image('HaluanKaalia','kuvat/HaluanKaaliakupla.png');
+    game.load.image('Haukkaus','kuvat/VainHaukkausKupla.png');
+    game.load.image('Nam','kuvat/NamKaaliaKupla.png');
+    
+    game.load.image('PPP','kuvat/PPPkupla.png');
+    
+    
+    
 }
 
 class Liikkumisjarki{
@@ -215,7 +236,8 @@ class Hahmo {
         }
     }
     
-    aseta_kupla(kupla) {
+    //Asettaa annetun nimisen kuplan hahmolle
+    asetaKupla(kupla) {
         this.poista_kupla();
         this.kupla = game.add.sprite(0,0, kupla);
         this.kupla.alpha = 0;
@@ -253,6 +275,15 @@ class Kentta {
     }
     
     
+    //Asettaa annetun nimiselle hahmolle kuplan.
+    asetaKupla(nimi,kupla){
+        for(var i = 0; i < this.hahmot.length; i++){
+            var hahmo = this.hahmot[i];
+            if (hahmo.nimi == nimi) hahmo.asetaKupla(kupla);
+        }
+    }
+    
+    
     //Päivittää äly tapahtumia.
     paivitaAlya(){
         for(var i = 0; i < this.hahmot.length; i++){
@@ -273,10 +304,12 @@ class Kentta {
         this.hahmot.push(hahmo);
     }
     
+    //Lisää pelihahmon
     lisaaPelihahmo(hahmo) {
         this.pelihahmo = hahmo;
     }
     
+    //Onko etanoita kyseisessä ruudussa.
     onkoEtanoita(x,y){
         for(var i = 0; i < this.hahmot.length; i++){
             var h = this.hahmot[i];
@@ -285,6 +318,7 @@ class Kentta {
         return false;
     }
     
+    //Skaalaa kentän ja hahmot.
     skaalaa(){
         var ruudun_leveys = Math.min((this.alue_x2 - this.alue_x1) / this.leveys, (this.alue_y2 - this.alue_y1) / this.korkeus);
         
@@ -295,6 +329,14 @@ class Kentta {
         if (typeof this.pelihahmo == 'undefined') return
         this.pelihahmo.skaalaa(ruudun_leveys,ruudun_leveys);
         this.pelihahmo.skaalaa_kupla(ruudun_leveys,ruudun_leveys);
+    }
+    
+    //Antaa tämän nimisen hahmon
+    annaHahmo(nimi){
+        for(var i = 0; i < this.hahmot.length; i++){
+            var h = this.hahmot[i];
+            if (h.nimi == nimi) return h;
+        }
     }
     
     
@@ -417,7 +459,10 @@ class Kentta {
 
         for (var i = 0; i < this.hahmot.length; i++) {
             var hahmo = this.hahmot[i];
-            if (this.pelihahmo.x == hahmo.x && this.pelihahmo.y == hahmo.y) return true;
+            if (this.pelihahmo.x == hahmo.x && this.pelihahmo.y == hahmo.y){
+                tappoi = hahmo.nimi;
+                return true;
+            }
         }
         
         return false;
@@ -435,13 +480,13 @@ function luoKentta() {
     if (elamat == 2) hahmo = new Hahmo('kaaliHaukku', "kaali", 0, 0);
     else if (elamat == 1) hahmo = new Hahmo('kaaliHaukku2', "kaali", 0, 0);
     else hahmo = new Hahmo('kaali', "kaali", 0, 0);
-    hahmo.aseta_kupla("pakokupla");
+    hahmo.asetaKupla("pakokupla");
     
-    var hahmo2 = new Hahmo('IZE', "etana2", 3, 0);
-    var hahmo3 = new Hahmo('IHE', "etana3", 3, 1);
-    var hahmo4 = new Hahmo('IEE', "etana4", 3, 2);
-    var hahmo5 = new Hahmo('IFE', "etana5", 5, 1);
-    var hahmo6 = new Hahmo('IVE', "etana6", 8, 1);
+    var hahmo2 = new Hahmo('IZE', "Zombi", 3, 0);
+    var hahmo3 = new Hahmo('IHE', "H", 3, 1);
+    var hahmo4 = new Hahmo('IEE', "EnTiia", 3, 2);
+    var hahmo5 = new Hahmo('IFE', "EnSano", 5, 1);
+    var hahmo6 = new Hahmo('IVE', "Viikate", 8, 1);
     
     
     hahmo2.aly = new Liikkumisjarki(0,4,0);
@@ -485,51 +530,72 @@ var suunnat = {
     PAIKKA: 4
 };
 
+var kuollut = false;
+
 function update() {
-    //Luetaan kontrollit ja liikutaan sen mukaan.
-    if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) && edellinenJohonkinYlhaalla[3]) {
-        kentta.liikuta("kaali",suunnat.OIKEA);
-    }
-    else {
-        if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && edellinenJohonkinYlhaalla[2]) {
-            kentta.liikuta("kaali",suunnat.VASEN);
+    
+    if (!kuollut) {
+        
+        //Luetaan kontrollit ja liikutaan sen mukaan.
+        if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) && edellinenJohonkinYlhaalla[3]) {
+            kentta.liikuta("kaali",suunnat.OIKEA);
         }
         else {
-            if (game.input.keyboard.isDown(Phaser.Keyboard.UP) && edellinenJohonkinYlhaalla[0]) {
-                kentta.liikuta("kaali",suunnat.YLOS);
+            if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && edellinenJohonkinYlhaalla[2]) {
+                kentta.liikuta("kaali",suunnat.VASEN);
             }
             else {
-                if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN) && edellinenJohonkinYlhaalla[1]) {
-                    kentta.liikuta("kaali",suunnat.ALAS);
+                if (game.input.keyboard.isDown(Phaser.Keyboard.UP) && edellinenJohonkinYlhaalla[0]) {
+                    kentta.liikuta("kaali",suunnat.YLOS);
+                }
+                else {
+                    if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN) && edellinenJohonkinYlhaalla[1]) {
+                        kentta.liikuta("kaali",suunnat.ALAS);
+                    }
                 }
             }
         }
-    }
-    if (game.input.keyboard.isDown(Phaser.Keyboard.ENTER)) kentta.pelihahmo.aseta_kupla("pakokupla");
-    if (game.input.keyboard.isDown(Phaser.Keyboard.R)) kentta.hahmot[0].aseta_kupla("pohjakupla");
-    
-    //Tallentaa onko pohjassa
-    var apu = [Phaser.Keyboard.UP, Phaser.Keyboard.DOWN, Phaser.Keyboard.LEFT, Phaser.Keyboard.RIGHT]
-    for(var i = 0; i < edellinenJohonkinYlhaalla.length; i++){
-        edellinenJohonkinYlhaalla[i] = !game.input.keyboard.isDown(apu[i]);
-    }
-    
-    //Tarkistaa tuliko syödyksi
-    if (kentta.onkoSamassa()) {
-        kentta.nollaaKentta();
+        if (game.input.keyboard.isDown(Phaser.Keyboard.ENTER)) kentta.pelihahmo.asetaKupla("pakokupla");
+        if (game.input.keyboard.isDown(Phaser.Keyboard.R)) kentta.hahmot[0].asetaKupla("pohjakupla");
         
-        if (--elamat <= 0){
-            peliOhi();
+        //Tallentaa onko pohjassa
+        var apu = [Phaser.Keyboard.UP, Phaser.Keyboard.DOWN, Phaser.Keyboard.LEFT, Phaser.Keyboard.RIGHT]
+        for(var i = 0; i < edellinenJohonkinYlhaalla.length; i++){
+            edellinenJohonkinYlhaalla[i] = !game.input.keyboard.isDown(apu[i]);
         }
-        else{
-            kentta = luoKentta();
+        
+        //Tarkistaa tuliko syödyksi
+        if (kentta.onkoSamassa()) {
+            
+            if (--elamat <= 0){
+                osuma(peliOhi);
+            }
+            else{
+                osuma(uusiKierros);
+            }
         }
     }
+    
+    paivitaKuplat();
     
     kentta.piirra();
     piste_teksti.setText('Pisteet: ' + pisteet);
     resize();
 }
+
+function osuma(f){
+    kuollut = true;
+    game.time.events.add(Phaser.Timer.SECOND * 3, f, this);
+    
+}
+
+function uusiKierros(){
+    kentta.nollaaKentta();
+    kentta = luoKentta();
+    kuollut = false;
+}
+
+var tappoi = "";
 
 
 function resize(){
@@ -549,8 +615,76 @@ function resize(){
     //kentta.paivitaAlue(10,w - 10, 0, h);
 }
 
+var vanha_kaaliX = 0;
+var vanha_HX = 3;
+var vanha_pisteet = 0;
+
+
+// Päivittää kuplat hahmoille.
+function paivitaKuplat(){
+    if (typeof kentta == 'undefined') return;
+    if (typeof kentta.pelihahmo == 'undefined') return;
+    
+    var P = kentta.pelihahmo;
+    
+    //Kuollut kommentit
+    if (tappoi == "Zombi") kentta.asetaKupla(tappoi, 'Nam');
+    else if (tappoi == "EnSano") kentta.asetaKupla(tappoi, 'Karsimaan');
+    else if (tappoi == "H") kentta.asetaKupla(tappoi, 'EiSatu');
+    tappoi = "";
+    
+    if (kuollut) return;
+    
+    //EtenemisKommentit
+    var uusi_kaaliX = P.x;
+    if (uusi_kaaliX > vanha_kaaliX) {
+        var kuplat = ['AlaPakoon','Napatkaa','Pysayttakaa'];
+        var r = game.rnd.integerInRange(0, 40);
+        if (r < kuplat.length) kentta.asetaKupla('EnSano', kuplat[r]);
+    }
+    
+    var H = kentta.annaHahmo('H');
+    var uusi_HX = H.x;
+    
+    //Lähikommentit H:lle
+    if (uusi_kaaliX != vanha_kaaliX || uusi_HX != vanha_HX) {
+        
+        if (typeof H !== 'undefined') {
+            if (H.x - 1 <= P.x && P.x <= H.x + 1 && H.y - 1 <= P.y && P.y <= H.y + 1) {//Onko kaali hahmon h vieressä
+                var kuplat = ['Veitsi','EnTee','Kaaliseni'];
+                var r = game.rnd.integerInRange(0, 20);
+                if (r < kuplat.length) kentta.asetaKupla('H', kuplat[r]);
+            }
+        }
+    }
+    
+    
+    //Satunnainen liikkumiskommentti.
+    if (vanha_kaaliX != uusi_kaaliX && vanha_HX % 2 == 1) {
+        var Z = kentta.annaHahmo('Zombi');
+        if (typeof Z !== 'undefined') {
+            var kuplat = ['Nalka','HaluanKaalia','Haukkaus'];
+            var r = game.rnd.integerInRange(0, 20);
+            if (r < kuplat.length) kentta.asetaKupla('Zombi', kuplat[r]);
+        }
+    }
+    
+    
+    //Pisteiden väliaika kommentti
+    if (vanha_pisteet != pisteet && pisteet % 13 == 0 && pisteet != 0) {
+        kentta.asetaKupla('Viikate', 'PPP');
+    }
+    
+    //Tallennetaan vanhat tiedot
+    vanha_kaaliX = uusi_kaaliX;
+    vanha_HX = uusi_HX;
+    vanha_pisteet = pisteet;
+}
+
+
 // Pelin loppuminen
 function peliOhi(){
+    kentta.nollaaKentta();
     var r = game.rnd.integerInRange(0, 5);
     if (r == 0) game.add.text(0,0, "Hävisit. Sinusta tehtiin kaalikääryleitä.");//Kirjoittaa lopputekstin
     else if (r == 1) game.add.text(0,0, "Yritit oikein hienosti... \nMutta sinusta tuli silti kaalilaatikko.");
