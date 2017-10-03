@@ -635,18 +635,22 @@ var tappoi = "";
 
 
 function resize(){
-    var w = window.innerWidth * window.devicePixelRatio;
-    game.width = w;
-    game.world.width = w;
+    game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // Kiitoksia tästä Juholle
+    game.scale.pageAlignHorizontally = true;
+    game.scale.pageAlignVertically = true;
     
-    var h = window.innerHeight * window.devicePixelRatio;
-    game.height = h;
-    game.world.height = h;
+    //var w = window.innerWidth * window.devicePixelRatio;
+    //game.width = w;
+    //game.world.width = w;
     
-    kentta.paivitaAlue(10,game.width - 10, 0, game.height);
+    //var h = window.innerHeight * window.devicePixelRatio;
+    //game.height = h;
+    //game.world.height = h;
     
-    piste_teksti.x = game.world.centerX;
-    piste_teksti.y = game.world.top;
+    //kentta.paivitaAlue(10,game.width - 10, 0, game.height);
+    
+    //piste_teksti.x = game.world.centerX;
+    //piste_teksti.y = game.world.top;
     
     //kentta.paivitaAlue(10,w - 10, 0, h);
 }
